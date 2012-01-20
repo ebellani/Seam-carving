@@ -1,10 +1,10 @@
 (ns seam-carving.auxiliary
-  "Auxiliary functions. Things like I/O, displaying images
-  and so forth."
+  "Auxiliary functions. Things like I/O, displaying images and so
+  forth."
   (:use    [clojure.java.io :only (file)]
            [clojure.reflect]
            [clojure.pprint])
-  (:import [java.awt Point]
+  (:import [java.awt       Point]
            [java.awt.image BufferedImage]
            [javax.swing    ImageIcon JOptionPane JLabel]
            [javax.imageio  ImageIO]))
@@ -48,14 +48,7 @@
                              (int (. point getX))
                              (int (. point getY))))
   ([raster x y]
-     (aget (. raster getPixel x y nil) 0)))
-
-;; static BufferedImage deepCopy(BufferedImage bi) {
-;;  ColorModel cm = bi.getColorModel();
-;;  boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-;;  WritableRaster raster = bi.copyData(null);
-;;  return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-;; }
+     (.getSample raster x y 0)))
 
 (defn clone-buffered-image [bimg]
   "Provides a way to clone a buffered image so we can still have
@@ -65,3 +58,10 @@ referential transparency."
                   (.isAlphaPremultiplied bimg)
                   nil))
 
+
+(defmacro with-tst-imgs [& body]
+  "exposes 3 identifiers to use for testing purposes."
+  `(let [~'large-img  (load-buffered-image "data/anatel-5.jpg")
+         ~'medium-img (load-buffered-image "data/anatel-5.jpg")
+         ~'small-img (load-buffered-image "data/cropped-anatel.jpg")]
+     ~@body))

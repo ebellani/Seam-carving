@@ -17,4 +17,3 @@ eyes."
 (deftest dividing-workload-tests
   (is (= (divide-workload 250 4)
          [[0 62] [62 124] [124 186] [186 250]])))
-

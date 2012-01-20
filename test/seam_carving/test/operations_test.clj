@@ -4,15 +4,14 @@
         [seam-carving.auxiliary]))
 
 
-(deftest check-images
-  (let [large-img (load-buffered-image "data/Valve_original_(1).PNG")
-        small-img (load-buffered-image "data/1E2.jpg")]
-    
-    (= (see-buffered-image (sobel-operator small-img)) nil)
-    ;; (= (see-buffered-image (second (sobel-operator small-img))) nil)
-  
-    ;; (= (see-buffered-image
-    ;;     (sobel-operator large-img)) nil)
-    ))
+(deftest grayscale-op-test
+  (with-tst-imgs
+    (let [gs (.getData (->grayscale medium-img))
+          cv (filter-image sobel-vertical-operation
+                           medium-img)
+          sobel (sobel-operator small-img)
+          ]
+      (see-buffered-image sobel)
+      )))
 
 
