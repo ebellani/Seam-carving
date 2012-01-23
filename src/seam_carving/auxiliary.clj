@@ -61,7 +61,7 @@ referential transparency."
 
 (defmacro with-tst-imgs [& body]
   "exposes 3 identifiers to use for testing purposes."
-  `(let [~'large-img  (load-buffered-image "data/anatel-5.jpg")
-         ~'medium-img (load-buffered-image "data/anatel-5.jpg")
+  `(let [~'large-img  (load-buffered-image "data/Valve_original_(1).PNG")
+         ~'medium-img (load-buffered-image "data/clock.jpg")
          ~'small-img (load-buffered-image "data/cropped-anatel.jpg")]
      ~@body))

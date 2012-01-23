@@ -28,10 +28,10 @@
   (with-tst-imgs
     (let [sobel-bimg       (sobel-operator small-img)
           seams            (generate-seams sobel-bimg)
-          ;; painted-sobel    (paint-seams sobel-bimg seams 15)
-          painted-original (paint-seams small-img seams 15)
-          ]
-      (println seams)
+          painted-sobel    (paint-seams sobel-bimg
+                                        (take 8 seams) Color/RED)
+          painted-original (paint-seams small-img
+                                        (take 8 seams) Color/RED)]
       ;; (doseq [seam seams]
       ;;   (println (:energy seam)))
       ;; (println (last seams))
@@ -41,17 +41,17 @@
       ;; (is (= (see-buffered-image bimg)
       ;;        nil))
       (see-buffered-image painted-original)
-      ;; (see-buffered-image painted-sobel)
-      ))
+      (see-buffered-image painted-sobel)))
   )
+  
 
 
 
-(deftest next-nodes-test
-  (is (= (next-nodes (Point. 3 3) 4 4) #{}))
-  (is (= (next-nodes (Point. 0 2) 4 4)
-         #{(Point. 0 3) (Point. 1 3)}))
-  (is (= (next-nodes (Point. 3 1) 4 4)
-         #{(Point. 2 2) (Point. 3 2)}))
-  (is (= (next-nodes (Point. 2 1) 4 4)
-         #{(Point. 1 2) (Point. 2 2) (Point. 3 2)})))
+;; (deftest next-nodes-test
+;;   (is (= (next-nodes (Point. 3 3) 4 4) #{}))
+;;   (is (= (next-nodes (Point. 0 2) 4 4)
+;;          #{(Point. 0 3) (Point. 1 3)}))
+;;   (is (= (next-nodes (Point. 3 1) 4 4)
+;;          #{(Point. 2 2) (Point. 3 2)}))
+;;   (is (= (next-nodes (Point. 2 1) 4 4)
+;;          #{(Point. 1 2) (Point. 2 2) (Point. 3 2)})))
