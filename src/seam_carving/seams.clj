@@ -15,10 +15,28 @@ path."
     ^{:doc "A map linking all the possible ways inside an image, and a sorted set of entry points."}
   [path-map entry-points])
 
+(defprotocol SeamJavaInterface
+  ^{:doc "This protocol exists because the Seam record is expected to
+  be exposed to JAVA."}
+  (getPoints [seam])
+  (getEnergy [seam]))
+
+(defrecord Seam
+    ^{:doc "A collection of Points and an energy value."}
+  [points energy]
+  SeamJavaInterface
+  (getPoints [seam]
+    (into-array Point (:points seam)))
+  (getEnergy [seam]
+    (:energy seam)))
+
 (defn build-seam-map [raster h w]
   "Read http://en.wikipedia.org/wiki/Seam_carving#Dynamic_Programming"
 
   (defn compare-points [p1 p2]
+    (let [value1 (get-raster-pixel-value raster p1)
+          value2 (get-raster-pixel-value raster p2)]
+      ())
     (> (get-raster-pixel-value raster p1)
        (get-raster-pixel-value raster p2)))
   
@@ -58,15 +76,18 @@ returns the one with the least amount of energy."
             (accumulate-seam-map-row 0 y seam-map #{})]
         (recur new-seam-map new-row (inc y))))))
 
-(defn reconstruct-path [path-map entry-point]
+(defn builds-seam-from-path [path-map entry-point raster]
   "walks back from the goal node to the initial node, that is marked
-by having a nil parent."
+by having a nil parent. "
   (loop [path           [entry-point]
-         current-parent (path-map entry-point)]
+         current-parent (path-map entry-point)
+         energy         (get-raster-pixel-value raster entry-point)]
     (if (nil? current-parent)
-      (reverse path)
+      (Seam. (reverse path) energy)
       (recur (conj path current-parent)
-             (path-map current-parent)))))
+             (path-map current-parent)
+             (+ energy
+                (get-raster-pixel-value raster current-parent))))))
 
 (defn- all-seams [raster width heigth]
   "Auxiliary accumulative function to generate all seams. Sorts the
@@ -74,8 +95,10 @@ seams by the lowest energy value."
   (let [seam-map     (build-seam-map raster heigth width)
         the-map      (:path-map seam-map)
         entry-points (:entry-points seam-map)]
-    (for [entry-point entry-points]
-      (reconstruct-path the-map entry-point))))
+    (sort #(< (:energy %1)
+              (:energy %2))
+          (for [entry-point entry-points]
+            (builds-seam-from-path the-map entry-point raster)))))
 
 (defn generate-seams [bimg]
   ^{:doc "A friendly wrapper for the all-seams function."}
@@ -99,10 +122,11 @@ seams by the lowest energy value."
 (defn paint-seams
   ([bimg seams] (paint-seams bimg seams Color/WHITE))
   ([bimg seams color]
-      "Creates a new image like the buffered image passed and paints all
-seams passed in it with a given color."
-      (let [cloned-bimg  (clone-buffered-image bimg)]
-        (doseq [seam seams]
-          (paint-seam cloned-bimg seam color))
-        cloned-bimg)))
+     "Creates a new image like the buffered image passed and paints
+all seams passed in it with a given color."
+     (let [cloned-bimg  (clone-buffered-image bimg)]
+       (doseq [seam seams]
+         (paint-seam cloned-bimg (:points seam) color))
+       cloned-bimg)))
+
 

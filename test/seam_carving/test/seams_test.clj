@@ -29,19 +29,27 @@
     (let [sobel-bimg       (sobel-operator small-img)
           seams            (generate-seams sobel-bimg)
           painted-sobel    (paint-seams sobel-bimg
-                                        (take 8 seams) Color/RED)
+                                        (take 1 seams) Color/RED)
           painted-original (paint-seams small-img
-                                        (take 8 seams) Color/RED)]
-      ;; (doseq [seam seams]
-      ;;   (println (:energy seam)))
+                                        (take 1 seams) Color/RED)]
+
+      ;; (println (let [seams-coll (for [seam seams]
+      ;;                             (into-array Point seam))
+      ;;                seam-array-type (class (first seams-coll))]
+      ;;            (into-array seam-array-type seams-coll)))
+
+      (doseq [seam seams]
+        (println (class (.getPoints seam))))
       ;; (println (last seams))
       ;; (pcalls #(see-buffered-image painted-original)
       ;;         #(see-buffered-image painted-sobel)
       ;;         #(see-buffered-image sobel-bimg))
       ;; (is (= (see-buffered-image bimg)
       ;;        nil))
-      (see-buffered-image painted-original)
-      (see-buffered-image painted-sobel)))
+      ;; (see-buffered-image painted-original)
+      ;; (see-buffered-image painted-sobel)
+      )
+    )
   )
   
 
